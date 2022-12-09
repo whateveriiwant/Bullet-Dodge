@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <thread>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -7,234 +6,18 @@
 #include <time.h>
 #include <random>
 #include <windows.h>
+#include "Character.h"
+#include "Bullet.h"
+#include "Item.h"
+#include "objCollision.h"
 
 using namespace std;
 using namespace sf;
 
-class Character {
-public:
-	CircleShape triangle;
-
-	double radius;
-	double diameter;
-	double posX;
-	double posY;
-	double velocity;
-	Character() {
-		posX = 0;
-		posY = 0;
-		radius = 10;
-		diameter = radius * 2;
-		velocity = 4;
-		triangle.setPosition(posX, posY);
-		triangle.setRadius(radius);
-		triangle.setFillColor(Color(255, 212, 0));
-		triangle.setPointCount(3);
-	}
-
-	Character(double x, double y, double rad) {
-		posX = x;
-		posY = y;
-		radius = rad;
-		diameter = radius * 2;
-		velocity = 4;
-		triangle.setPosition(posX, posY);
-		triangle.setRadius(radius);
-		triangle.setFillColor(Color(255, 212, 0));
-		triangle.setPointCount(3);
-	}
-
-	void setVelocity(double vel) {
-		velocity = vel;
-	}
-
-	double getVelocity() {
-		return velocity;
-	}
-
-	void setRadius(double rad) {
-		radius - rad;
-		diameter = radius * 2;
-		triangle.setRadius(radius);
-	}
-
-	void setPosition(double x, double y) {
-		posX = x;
-		posY = y;
-		triangle.setPosition(x, y);
-	}
-
-	void move(double dx, double dy) {
-		triangle.move(dx, dy);
-	}
-
-	CircleShape getCharacter() {
-		return triangle;
-	}
-
-	~Character() {}
-};
-
-class Bullet {
-public:
-	CircleShape circle;
-
-	double radius;
-	double diameter;
-	double posX;
-	double posY;
-	double bulletXVelocity;
-	double bulletYVelocity;
-
-	Bullet() {
-		posX = 0;
-		posY = 0;
-		radius = 20;
-		diameter = radius * 2;
-		bulletXVelocity = 5;
-		bulletYVelocity = 5;
-		circle.setPosition(posX, posY);
-		circle.setRadius(radius);
-		circle.setFillColor(Color(255, 105, 180));
-		circle.setPointCount(30);
-	}
-
-	Bullet(double x, double y, double rad) {
-		posX = x;
-		posY = y;
-		radius = rad;
-		diameter = radius * 2;
-		bulletXVelocity = 5;
-		bulletYVelocity = 5;
-		circle.setPosition(posX, posY);
-		circle.setRadius(radius);
-		circle.setFillColor(Color(255, 105, 180));
-		circle.setPointCount(30);
-	}
-
-	void setVelocity(double vel) {
-		bulletXVelocity = vel;
-		bulletYVelocity = vel;
-	}
-
-	double getXVelocity() {
-		return bulletXVelocity;
-	}
-
-	double getYVelocity() {
-		return bulletYVelocity;
-	}
-
-	void setRadius(double rad) {
-		radius - rad;
-		diameter = radius * 2;
-		circle.setRadius(radius);
-	}
-
-	void setPosition(double x, double y) {
-		posX = x;
-		posY = y;
-		circle.setPosition(x, y);
-	}
-
-	void move(double dx, double dy) {
-		circle.move(dx, dy);
-	}
-
-	CircleShape getBullet() {
-		return circle;
-	}
-
-	~Bullet() {}
-};
-
-class Item {
-public:
-	CircleShape square;
-
-	double posX;
-	double posY;
-	double radius;
-	double diameter;
-
-	Item() {
-		posX = 0;
-		posY = 0;
-		radius = 25;
-		diameter = radius * 2;
-		square.setRadius(radius);
-		square.setPosition(posX, posY);
-		square.setFillColor(Color(255, 192, 203));
-		square.setPointCount(4);
-	}
-
-	Item(double x, double y, double rad) {
-		posX = x;
-		posY = y;
-		radius = rad;
-		diameter = radius * 2;
-		square.setRadius(radius);
-		square.setPosition(posX, posY);
-		square.setFillColor(Color(255, 192, 203));
-		square.setPointCount(4);
-	}
-
-	void setPosition(double x, double y) {
-		posX = x;
-		posY = y;
-		square.setPosition(x, y);
-	}
-
-	void setRadius(double rad) {
-		radius - rad;
-		diameter = radius * 2;
-		square.setRadius(radius);
-	}
-
-	CircleShape getItem() {
-		return square;
-	}
-};
-
-class objCollision {
-public:
-	double radius;
-	double posX;
-	double posY;
-
-	bool collisionTest(Character c1, Bullet c2);
-	bool collisionItem(Character c1, Item c2);
-	~objCollision() {}
-};
-
-bool objCollision::collisionTest(Character c1, Bullet c2) {
-	double distance;
-	distance = sqrt(pow(abs(c1.posX - c2.posX), 2) + pow(abs(c1.posY - c2.posY), 2));
-
-	if (distance <= c1.radius + c2.radius) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-bool objCollision::collisionItem(Character c1, Item c2) {
-	double distance;
-	distance = sqrt(pow(abs(c1.posX - c2.posX), 2) + pow(abs(c1.posY - c2.posY), 2));
-	if (distance <= c1.radius + c2.radius) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-int main()
-{
+int main() {
 	int nX = 1200;
 	int nY = 900;
-	RenderWindow window(VideoMode(nX, nY), "Moving Ball");
+	RenderWindow window(VideoMode(nX, nY), "Bullet Dodge");
 	window.setFramerateLimit(120);
 
 	random_device rd; // create random_device to receive seed value
@@ -252,26 +35,11 @@ int main()
 	double b_posY = nY - bulletDiameter;
 	double i_posX = 0;
 	double i_posY = nY - 25;
-	double velocity = 15;
-	double bulletXVelocity = 15;
-	double bulletYVelocity = 15;
+	
 	bool collide = false; // check collision state
-	bool getItem = false; // check if character get item
-
-	CircleShape triangle(characterRadius); //반지름
-	triangle.setPosition(c_posX, c_posY);
-	triangle.setFillColor(Color(255, 212, 0));
-	triangle.setPointCount(3);
-
-	CircleShape circle(bulletRadius);
-	circle.setPosition(b_posX, b_posY);
-	circle.setFillColor(Color(129, 193, 71));
-	circle.setPointCount(30);
-
-	CircleShape square(25, 4);
-	square.setPosition(i_posX, i_posY);
-	square.setFillColor(Color(255, 192, 203));
-	square.setPointCount(4);
+	bool getItem = false; // check if character getting an item
+	bool itemCreated = false; // check if item is created
+	bool isBulletCreated = false; // check if bullet is created
 
 	Character Character1(c_posX + 580, c_posY - 450, characterRadius);
 	objCollision collTest;
@@ -279,7 +47,7 @@ int main()
 	vector<Bullet> bulletList;
 	vector<Item> itemList;
 
-	Item item1(800, 800, 25);
+	Item item1(dis_x(gen), dis_y(gen), 25);
 	itemList.push_back(item1);
 
 	for (int i = 0; i < 5; i++) { // initial bullets quantity = 5
@@ -287,13 +55,23 @@ int main()
 		bulletList.push_back(obj);
 	}
 
+	for (int i = 0; i < 4; i++) { // check collision between bullets
+		for (int j = i + 1; j < 5; j++) { 
+			if (collTest.spawnCollision(bulletList[i], bulletList[j]) < 40) {
+				while (collTest.spawnCollision(bulletList[i], bulletList[j]) < 40) {
+					bulletList.erase(bulletList.begin() + i);
+					Bullet newObj(dis_x(gen), dis_y(gen), bulletRadius);
+					bulletList.push_back(newObj);
+				}
+			}
+		}
+	}
+
 	Text timeText;
 	Text bulletText;
 	
 	int t = 0;
-	/*int b = bulletList.size();*/
-	bool isCreated = false;
-
+	
 	Font font;
 	if (!font.loadFromFile("C:\\Users\\seungjun\\source\\repos\\sfml_ex1\\sfml_ex1\\arial.ttf")) {
 		return 42; // Robust error handling!
@@ -312,8 +90,6 @@ int main()
 	bulletText.setPosition(0, 50);
 
 	Clock timer;
-
-	Clock itemTimer;
 
 	float currentTime = 0;
 
@@ -352,11 +128,11 @@ int main()
 			if (Character1.posX >= 1142)
 				Character1.setPosition(1142, Character1.posY);
 		}
-		if (Keyboard::isKeyPressed(Keyboard::Q)) {
+		if (Keyboard::isKeyPressed(Keyboard::Q)) { // press Q to quit
 			window.close();
 		}
 		
-		for (int i = 0; i < bulletList.size(); i++) {
+		for (int i = 0; i < bulletList.size(); i++) { // move bullets
 			bulletList[i].posX += bulletList[i].getXVelocity();
 			bulletList[i].posY += bulletList[i].getYVelocity();
 			bulletList[i].move(bulletList[i].getXVelocity(), bulletList[i].getYVelocity());
@@ -371,7 +147,7 @@ int main()
 			}
 		}
 
-		float time = timer.getElapsedTime().asSeconds();
+		float time = timer.getElapsedTime().asSeconds(); // check time
 		
 		timeText.setString(to_string(time) + " sec");
 		bulletText.setString("Bullets: " + to_string(bulletList.size()));
@@ -379,7 +155,6 @@ int main()
 		// 화면을 지운다. 
 		window.clear();
 
-		// 화면에 원을 그린다. 
 		window.draw(Character1.getCharacter());
 
 		for (int i = 0; i < bulletList.size(); i++) {
@@ -389,41 +164,39 @@ int main()
 		window.draw(timeText);
 		window.draw(bulletText);
 
-
 		if ((int)time % 4 == 0 && (int)time != 0) { // create item every 4 seconds, duration is a second
-			Item item1(800, 800, 25);
+			Item item1(dis_x(gen), dis_y(gen), 25);
 			itemList.push_back(item1);
+			itemCreated = true;
 			window.draw(itemList[0].getItem());
 		}
 		else {
 			itemList.clear();
+			itemCreated = false;
 		}
 
-		
-
-		if (collTest.collisionItem(Character1, item1) == true) { // when collide to item
+		if (collTest.collisionItem(Character1, item1) == true && itemCreated == true) { // when collide to item
 			getItem = true;
 			Character1.setVelocity(7);
 			currentTime = time;
 		}
 
-		if ((int)time - (int)currentTime > 4) {
+		if ((int)time - (int)currentTime > 4) { // if time elapsed after getting an item
 			Character1.setVelocity(4);
 			currentTime = 0;
-			cout << "changed" << endl;
 		}
 
-		// 화면을 표시한다. 
+		// display the screen
 		window.display();
 
-
+		// GAME OVER SITUATION
 		for (int i = 0; i < bulletList.size(); i++) {
-			if (collTest.collisionTest(Character1, bulletList[i]) == true) // when collide to bullets
+			if (collTest.collisionTest(Character1, bulletList[i]) == true && (int)time != 0) // when collide to bullets
 				collide = true;
 		}
 
 		if ((int)time % 5 == 0) { // create one bullet at every 5 seconds
-			if (isCreated == true)
+			if (isBulletCreated == true)
 				continue;
 
 			if ((int)time == 0)
@@ -431,14 +204,13 @@ int main()
 			else {
 				Bullet obj(dis_x(gen), dis_y(gen), bulletRadius);
 				bulletList.push_back(obj);
-				isCreated = true;
+				isBulletCreated = true;
 			}
 		}
 		else {
-			isCreated = false;
+			isBulletCreated = false;
 		}
 		
-
 		while (collide == true) { // when game is over
 			Text endText;
 			Text endText2;
@@ -475,6 +247,17 @@ int main()
 					Bullet obj(dis_x(gen), dis_y(gen), bulletRadius);
 					bulletList.push_back(obj);
 				}
+
+				for (int i = 0; i < 4; i++) {
+					for (int j = i + 1; j < 5; j++) {
+						if (collTest.spawnCollision(bulletList[i], bulletList[j]) == true) {
+							bulletList.erase(bulletList.begin() + i);
+							Bullet newObj(dis_x(gen), dis_y(gen), bulletRadius);
+							bulletList.push_back(newObj);
+						}
+					}
+				}
+
 				Character1.setVelocity(4);
 				currentTime = 0;
 
